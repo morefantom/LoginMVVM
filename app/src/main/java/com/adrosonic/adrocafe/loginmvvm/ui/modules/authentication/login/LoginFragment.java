@@ -3,6 +3,8 @@ package com.adrosonic.adrocafe.loginmvvm.ui.modules.authentication.login;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +17,7 @@ import com.adrosonic.adrocafe.loginmvvm.R;
 import com.adrosonic.adrocafe.loginmvvm.databinding.FragmentLoginBinding;
 import com.adrosonic.adrocafe.loginmvvm.ui.modules.authentication.AuthViewModel;
 import com.adrosonic.adrocafe.loginmvvm.ui.modules.authentication.signup.SignupFragment;
+import com.adrosonic.adrocafe.loginmvvm.ui.modules.landing.LandingActivity;
 
 public class LoginFragment extends Fragment {
 
@@ -40,7 +43,14 @@ public class LoginFragment extends Fragment {
             @Override
             public void onChanged(String s) {
                 if (getFragmentManager() != null)
-                getFragmentManager().beginTransaction().replace(R.id.container_main, new SignupFragment(), "Sign Up").addToBackStack(null).commit();
+                    if (s.equals("Landing")){
+                        if (getActivity() != null){
+                            getActivity().startActivity(new Intent(getActivity(), LandingActivity.class));
+                            getActivity().finish();
+                        }
+                    }else {
+                        getFragmentManager().beginTransaction().replace(R.id.container_main, new SignupFragment(), "Sign Up").addToBackStack(null).commit();
+                    }
             }
         });
     }
