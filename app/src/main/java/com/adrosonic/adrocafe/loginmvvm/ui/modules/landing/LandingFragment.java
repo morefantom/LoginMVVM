@@ -9,23 +9,21 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.adrosonic.adrocafe.loginmvvm.R;
 import com.adrosonic.adrocafe.loginmvvm.data.ApiResponse;
 import com.adrosonic.adrocafe.loginmvvm.databinding.LandingFragmentBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LandingFragment extends Fragment {
 
     private LandingViewModel mViewModel;
-    private LandingListAdapter landingListAdapter;
     private LandingFragmentBinding binding;
 
     @Override
@@ -54,10 +52,13 @@ public class LandingFragment extends Fragment {
 
         mViewModel.getResponses().observe(this, new Observer<List<ApiResponse>>() {
             @Override
-            public void onChanged(List<ApiResponse> apiResponses) {
-                landingListAdapter = new LandingListAdapter(apiResponses, getContext());
-                binding.recyclerViewLanding.setLayoutManager(new LinearLayoutManager(getActivity()));
-                binding.recyclerViewLanding.setAdapter(landingListAdapter);
+            public void onChanged(List<ApiResponse> apiResponseList) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    Map<String, List<ApiResponse>> apiResponseMap = apiResponseList.stream().collect(Collectors.groupingBy(ApiResponse::getUserId));
+                    List<String> titleList = new ArrayList<String>(apiResponseMap.keySet());
+                    ExpandableListAdapter expandableListAdapter = new ExpandableListAdapter(getActivity(), titleList, apiResponseMap);
+                    binding.expandableListView.setAdapter(expandableListAdapter);
+                }
             }
         });
     }
