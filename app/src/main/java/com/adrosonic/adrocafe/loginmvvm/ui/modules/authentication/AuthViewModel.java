@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.adrosonic.adrocafe.loginmvvm.data.SingleLiveEvent;
 import com.adrosonic.adrocafe.loginmvvm.data.User;
+import com.adrosonic.adrocafe.loginmvvm.repository.PrefManager;
 import com.adrosonic.adrocafe.loginmvvm.repository.local.AppDatabase;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -21,10 +22,12 @@ import io.reactivex.subscribers.DisposableSubscriber;
 public class AuthViewModel extends AndroidViewModel {
 
     private AppDatabase appDatabase;
+    private PrefManager prefManager;
 
     public AuthViewModel(@NonNull Application application) {
         super(application);
         appDatabase = AppDatabase.getInstance(application);
+        prefManager = new PrefManager(application);
     }
 
     private MutableLiveData<String> editTextUsername = new MutableLiveData<String>();
@@ -75,6 +78,7 @@ public class AuthViewModel extends AndroidViewModel {
                         public void onNext(User user) {
                             if (user.getPassword().equals(password)){
                                 Log.i("Login", "Successful");
+                                prefManager.saveLogin(true);
                                 _navigateTo.setValue("Landing");
                             }else {
                                 Log.i("Login", "Unsuccessful");
@@ -109,6 +113,8 @@ public class AuthViewModel extends AndroidViewModel {
                         @Override
                         public void onComplete() {
                             Log.i("insert user","complete");
+                            prefManager.saveLogin(true);
+                            _navigateTo.setValue("Landing");
                         }
 
                         @Override
